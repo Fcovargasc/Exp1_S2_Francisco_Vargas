@@ -1,9 +1,9 @@
-  -- **SQL1 Documentada**: TRUNCAR tabla destino para re-ejecuciones
-  -- Permite ejecutar el bloque múltiples veces limpiando datos previos
+  -- TRUNCAR tabla destino para re-ejecuciones
+  -- Permite ejecutar el bloque mÃºltiples veces limpiando datos previos
 TRUNCATE TABLE USUARIO_CLAVE;
 
 DECLARE
-  -- Variables %TYPE requeridas (mínimo 3)
+  -- Variables %TYPE requeridas (mÃ­nimo 3)
   v_numrun_emp empleado.numrun_emp%TYPE;
   v_dvrun_emp empleado.dvrun_emp%TYPE;
   v_appaterno_emp empleado.appaterno_emp%TYPE;
@@ -25,7 +25,7 @@ BEGIN
 
  
   
-  -- **Iteración sobre empleados existentes** (100-320)
+  -- **IteraciÃ³n sobre empleados existentes** (100-320)
   FOR rec IN (
     
     -- Une EMPLEADO con ESTADO_CIVIL para obtener nombre completo del estado civil
@@ -37,7 +37,7 @@ BEGIN
     ORDER BY e.id_emp  -- Orden ascendente requerido
   ) LOOP
     
-    -- Asignación variables %TYPE
+    -- AsignaciÃ³n variables %TYPE
     v_numrun_emp := rec.numrun_emp;
     v_dvrun_emp := rec.dvrun_emp;
     v_appaterno_emp := rec.appaterno_emp;
@@ -46,21 +46,21 @@ BEGIN
     v_fecha_nac := rec.fecha_nac;
     v_fecha_contrato := rec.fecha_contrato;
     
-    -- Cálculo años trabajo (redondeo entero requerido)
-    -- Usa MONTHS_BETWEEN para precisión y ROUND para entero sin decimales
+    -- CÃ¡lculo aÃ±os trabajo (redondeo entero requerido)
+    -- Usa MONTHS_BETWEEN para precisiÃ³n y ROUND para entero sin decimales
     v_anos_trabajo := ROUND(MONTHS_BETWEEN(SYSDATE, v_fecha_contrato)/12);
     v_estado_civil_inicial := LOWER(SUBSTR(rec.nombre_estado_civil,1,1));
     v_nombre_empleado := v_pnombre_emp || ' ' || v_appaterno_emp;
     
     -- USUARIO - 
-    v_usuario := v_estado_civil_inicial ||                    -- a) 1ra letra estado civil minúscula
+    v_usuario := v_estado_civil_inicial ||                    -- a) 1ra letra estado civil minÃºscula
                  LOWER(SUBSTR(v_pnombre_emp,1,3)) ||          -- b) 3 primeras letras nombre
                  LENGTH(v_pnombre_emp) ||                     -- c) largo nombre
                  '*' ||                                        -- d) asterisco
-                 SUBSTR(TO_CHAR(v_sueldo_base),-1) ||         -- e) último dígito sueldo
-                 v_dvrun_emp ||                               -- f) dígito verificador RUN
-                 v_anos_trabajo ||                            -- g) años trabajando
-                 CASE WHEN v_anos_trabajo < 10 THEN 'X' END;  -- h) X si menos de 10 años
+                 SUBSTR(TO_CHAR(v_sueldo_base),-1) ||         -- e) Ãºltimo dÃ­gito sueldo
+                 v_dvrun_emp ||                               -- f) dÃ­gito verificador RUN
+                 v_anos_trabajo ||                            -- g) aÃ±os trabajando
+                 CASE WHEN v_anos_trabajo < 10 THEN 'X' END;  -- h) X si menos de 10 aÃ±os
     
     -- Letras apellido por estado civil ,Cada estado civil separado
     
@@ -82,12 +82,12 @@ BEGIN
     
     
     -- CLAVE 
-    v_clave := SUBSTR(TO_CHAR(v_numrun_emp),3,1) ||                    -- a) 3er dígito RUN
-               (EXTRACT(YEAR FROM v_fecha_nac)+2) ||                   -- b) año nacimiento +2
-               LPAD(TO_NUMBER(SUBSTR(TO_CHAR(v_sueldo_base),-3))-1,3,'0') || -- c) 3 últimos sueldo -1
+    v_clave := SUBSTR(TO_CHAR(v_numrun_emp),3,1) ||                    -- a) 3er dÃ­gito RUN
+               (EXTRACT(YEAR FROM v_fecha_nac)+2) ||                   -- b) aÃ±o nacimiento +2
+               LPAD(TO_NUMBER(SUBSTR(TO_CHAR(v_sueldo_base),-3))-1,3,'0') || -- c) 3 Ãºltimos sueldo -1
                v_letras_apellido ||                                    -- d) 2 letras por estado civil
                rec.id_emp ||                                            -- e) ID empleado
-               TO_CHAR(SYSDATE,'MMYY');                                -- f) mes/año actual (paramétrico)
+               TO_CHAR(SYSDATE,'MMYY');                                -- f) mes/aÃ±o actual (paramÃ©trico)
     
     -- Inserta credenciales ordenadas por ID_EMP
     INSERT INTO USUARIO_CLAVE VALUES(rec.id_emp, v_numrun_emp, v_dvrun_emp, 
@@ -96,7 +96,7 @@ BEGIN
     
   END LOOP;
   
-  -- COMMIT condicional (requerimiento técnico)
+  -- COMMIT condicional (requerimiento tÃ©cnico)
   IF v_contador > 0 THEN
     COMMIT;
     DBMS_OUTPUT.PUT_LINE('? Exito: ' || v_contador || ' credenciales generadas');
@@ -119,4 +119,5 @@ SELECT id_emp,
        clave_usuario AS "CLAVE_USUARIO"
 FROM USUARIO_CLAVE 
 ORDER BY id_emp;
+
 
